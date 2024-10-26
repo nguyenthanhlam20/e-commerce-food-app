@@ -1,0 +1,74 @@
+plugins {
+    id 'com.android.application'
+}
+
+apply plugin: 'realm-android'
+
+android {
+    namespace 'vn.edu.fpt.fa24'
+    compileSdk 33
+    compileSdkVersion 33 // Use the latest stable API level
+
+    defaultConfig {
+        applicationId "vn.edu.fpt.fa24"
+        minSdk 26
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        checkReleaseBuilds false
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        dataBinding true
+        viewBinding true
+    }
+    realm {
+        syncEnabled = true
+    }
+}
+
+dependencies {
+    // MultiDex support
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    // AndroidX libraries
+    implementation 'androidx.appcompat:appcompat:1.6.1'               // Latest stable
+    implementation 'com.google.android.material:material:1.9.0'       // Latest stable
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4' // Compatible with AGP 7.5
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    // HTTP request libraries
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.10.0' // Optional: For logging
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'androidx.navigation:navigation-fragment:2.5.3'
+    implementation 'androidx.navigation:navigation-ui:2.5.3'
+
+    // Testing libraries
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+
+    // Image and UI-related libraries
+    implementation 'com.squareup.picasso:picasso:2.71828' // Check for the latest stable AndroidX-compatible version if available
+    implementation 'de.hdodenhof:circleimageview:3.1.0'           // Latest stable
+    implementation 'com.github.Cutta:GifView:1.4'
+
+    // PhotoView for zooming and scaling images
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'        // Latest stable
+
+}
