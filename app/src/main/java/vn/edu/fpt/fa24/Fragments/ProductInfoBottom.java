@@ -2,199 +2,109 @@ package vn.edu.fpt.fa24.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
-
-import vn.edu.fpt.fa24.CustomDatabase;
-import vn.edu.fpt.fa24.DatabaseHelper.DatabaseHelper;
-import vn.edu.fpt.fa24.DatabaseHelper.ProductHistory;
+import vn.edu.fpt.fa24.Helpers.SessionHelper;
 import vn.edu.fpt.fa24.ImageViewActivity;
-import vn.edu.fpt.fa24.Interfaces.HistoryUpdated;
-import vn.edu.fpt.fa24.Models.TrendingProducts;
+import vn.edu.fpt.fa24.Listeners.CartListener;
+import vn.edu.fpt.fa24.Models.ProductModel;
 import vn.edu.fpt.fa24.R;
-import vn.edu.fpt.fa24.ReportActivity;
+import vn.edu.fpt.fa24.Requests.CartRequest;
+import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
+import vn.edu.fpt.fa24.Services.CartService;
+import vn.edu.fpt.fa24.Services.ProductService;
 
 public class ProductInfoBottom extends BottomSheetDialogFragment {
-    private  Context mContext;
-    private TrendingProducts trendingProducts;
-    private ArrayList<TrendingProducts>savedProducts = new ArrayList<>();
-    ImageView imageView,imageView2;
-    ImageView like;
-    Button buyBtn;
-    DatabaseHelper databaseHelper;
-    ProductHistory productHistory;
-    RelativeLayout parent;
-    Button report;
-    int click =0 ;
-    CardView amazonIcon;
+    private final Context mContext;
+    private final ProductModel trendingProduct;
+    ImageView imageView;
+    Button addToCart;
+    TextView productName, productPrice, productDesc;
+    ProductService productService;
+    CartService cartService;
+    SessionHelper session;
+    private CartListener listener;
 
-    HistoryUpdated historyUpdated;
-    TextView productName,productPrice,productDesc;
-    public ProductInfoBottom(Context mContext, TrendingProducts trendingProducts, HistoryUpdated historyUpdated) {
-        this.mContext=mContext;
-        this.trendingProducts = trendingProducts;
-        this.historyUpdated=historyUpdated;
+    private String userId;
+
+    public ProductInfoBottom(Context mContext, ProductModel trendingProduct) {
+        this.mContext = mContext;
+        this.trendingProduct = trendingProduct;
     }
 
-    public ProductInfoBottom(Context mContext, TrendingProducts trendingProducts) {
-        this.mContext=mContext;
-        this.trendingProducts = trendingProducts;
-        this.historyUpdated=null;
+    public void notifyCartChanged(Context context) {
+        Intent intent = new Intent(CartListener.ACTION_UPDATE_CART);
+        context.sendBroadcast(intent);
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull  LayoutInflater inflater, @Nullable  ViewGroup container, @Nullable  Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.product_info_bottom,container);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.product_info_bottom, container);
 
         imageView = view.findViewById(R.id.mainImage);
-        imageView2 = view.findViewById(R.id.img1);
-        productName = (TextView) view.findViewById(R.id.pName);
-        productPrice = (TextView) view.findViewById(R.id.pPrice);
-        parent = (RelativeLayout) view.findViewById(R.id.parent);
-        productDesc = (TextView) view.findViewById(R.id.pDesc);
-        like = (ImageView) view.findViewById(R.id.like);
-        report = (Button) view.findViewById(R.id.productReport);
-        buyBtn = (Button) view.findViewById(R.id.buyBtn);
-        amazonIcon = (CardView) view.findViewById(R.id.amazonIcon);
+        productName =  view.findViewById(R.id.pName);
+        productPrice =  view.findViewById(R.id.pPrice);
+        productDesc =  view.findViewById(R.id.pDesc);
+        addToCart =  view.findViewById(R.id.addToCart);
 
-        databaseHelper = new DatabaseHelper(getContext());
-        productHistory = new ProductHistory(getContext());
+        productService = new ProductService();
+        cartService = new CartService();
+        session = new SessionHelper(requireActivity());
+        userId = session.getUserId();
 
-        ArrayList<TrendingProducts> arrayList = new ArrayList<>();
-        arrayList = databaseHelper.getAllData();
-        for (TrendingProducts trendingProducts1 : arrayList){
-            if (trendingProducts1.getId().equalsIgnoreCase(trendingProducts.getId())){
-                like.setImageResource(R.drawable.heart_filled2);
-                ++click;
-            }
-        }
-
-        buyBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(trendingProducts.getAmazon()));
-                startActivity(browserIntent);
-
-            }
-        });
-        amazonIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(trendingProducts.getAmazon()));
-                startActivity(browserIntent);
-            }
-        });
-        like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (click ==0 ){
-                    like.setImageResource(R.drawable.heart_filled2);
-                    ++click;
-                    if(databaseHelper.addText(trendingProducts))
-                        Toast.makeText(mContext, "Added to cart", Toast.LENGTH_SHORT).show();
-
-                }else{
-                    like.setImageResource(R.drawable.heart2);
-                    --click;
-                     if(databaseHelper.deleteRow(trendingProducts.getId()))
-                         Toast.makeText(mContext, "Removed from cart", Toast.LENGTH_SHORT).show();
-
-
-                }
-
-            }
-        });
-        report.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ReportActivity.class);
-                intent.putExtra("product", trendingProducts);
-                startActivity(intent);
-            }
-        });
-
-        reported();
-        addInHistory();
-
-        productName.setText(trendingProducts.getName());
-        productPrice.setText(trendingProducts.getPrice());
-        productDesc.setText(trendingProducts.getDescription());
-
-        Picasso.get().load(trendingProducts.getImage()).into(imageView);
-        Picasso.get().load(trendingProducts.getImage()).into(imageView2);
-
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ImageViewActivity.class);
-                intent.putExtra("uri",trendingProducts.getImage());
-                startActivity(intent);
-
-            }
-        });
-
-        imageView2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ImageViewActivity.class);
-                intent.putExtra("uri",trendingProducts.getImage());
-                startActivity(intent);
-            }
-        });
+        setProduct();
+        setListeners();
 
         return view;
     }
-    public void reported(){
-//        CustomDatabase customDatabase = new CustomDatabase() ;
-//        CollectionReference products  = customDatabase.getSettings().collection("reports");
-//        products.document(trendingProducts.getId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                if (documentSnapshot.exists()){
-//                    String solved = documentSnapshot.getString("solved");
-//                    if (solved.equalsIgnoreCase("false")){
-//                        report.setText("In Review");
-//                        report.setEnabled(false);
-//                    }else{
-//                        report.setEnabled(true);
-//                    }
-//                }
-//
-//            }
-//        });
+
+    private void setListeners() {
+        addToCart.setOnClickListener(v -> {
+            String productId = trendingProduct.getProductId();
+            String price = trendingProduct.getUnitPrice();
+            CartRequest request = new CartRequest(userId, productId, "1", price);
+
+            cartService.addToCart(request, new ResponseCallBack<String>() {
+                @Override
+                public void onSuccess(String response) {
+                    notifyCartChanged(mContext);
+                    requireActivity().runOnUiThread(() -> Toast.makeText(mContext, "Added to cart", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    requireActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Failed to add product to cart", Toast.LENGTH_SHORT).show());
+                }
+            });
+        });
     }
 
-    public void addInHistory(){
-        if (historyUpdated!=null){
-            ArrayList<TrendingProducts>products = productHistory.getAllData();
-            historyUpdated.getUpdateResult(true);
-            if (products.size() < 4){
+    private void setProduct() {
+        productName.setText(trendingProduct.getProductName());
+        productPrice.setText(trendingProduct.getFormattedUnitPrice());
+        productDesc.setText(trendingProduct.getDescription());
 
-                productHistory.addProducts(trendingProducts);
-            }else{
-                int random = ThreadLocalRandom.current().nextInt(0, 3);
-                productHistory.updateProducts(trendingProducts,random);
-            }
-        }
+        Picasso.get().load(trendingProduct.getProductImage()).into(imageView);
+
+        imageView.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), ImageViewActivity.class);
+            intent.putExtra("uri", trendingProduct.getProductImage());
+            startActivity(intent);
+
+        });
     }
-
 }

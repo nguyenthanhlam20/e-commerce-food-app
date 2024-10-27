@@ -17,65 +17,48 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import vn.edu.fpt.fa24.Fragments.ProductInfoBottom;
-import vn.edu.fpt.fa24.Interfaces.HistoryUpdated;
-import vn.edu.fpt.fa24.Models.TrendingProducts;
+import vn.edu.fpt.fa24.Models.ProductModel;
 import vn.edu.fpt.fa24.R;
 
 public class TrendingRecyclerAdapter extends RecyclerView.Adapter<TrendingRecyclerAdapter.Viewholder> {
     Context mContext;
-    ArrayList<TrendingProducts>trendingList = new ArrayList<>();
+    ArrayList<ProductModel> trendingList;
     FragmentManager supportFragmentManager;
-    HistoryUpdated historyUpdated;
 
-    public TrendingRecyclerAdapter(ArrayList<TrendingProducts> trendingList, Context context, FragmentManager supportFragmentManager, HistoryUpdated historyUpdated) {
+    public TrendingRecyclerAdapter(ArrayList<ProductModel> trendingList, Context context, FragmentManager supportFragmentManager) {
         mContext = context;
-        this.trendingList=trendingList;
-        this.supportFragmentManager=supportFragmentManager;
-        this.historyUpdated=historyUpdated;
-
+        this.trendingList = trendingList;
+        this.supportFragmentManager = supportFragmentManager;
     }
 
     @NonNull
     @Override
-    public Viewholder onCreateViewHolder(@NonNull  ViewGroup parent, int viewType) {
-        View view = null;
-             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_products_layout,parent,false);
-
-
+    public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_products_layout, parent, false);
         return new Viewholder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull  Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
 
-        TrendingProducts trendingProducts = trendingList.get(position);
-        holder.productName.setText(trendingProducts.getName());
-        holder.productPrice.setText(trendingProducts.getPrice());
-        Picasso.get().load(trendingProducts.getImage())
+        ProductModel trendingProducts = trendingList.get(position);
+        holder.productName.setText(trendingProducts.getProductName());
+        holder.productPrice.setText(trendingProducts.getFormattedUnitPrice());
+        Picasso.get().load(trendingProducts.getProductImage())
                 .into(holder.productImage);
 
 
-        if(position == 0){
+        if (position == 0) {
             holder.crownImage.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             holder.crownImage.setVisibility(View.GONE);
         }
 
         //opening bottom sheet
-      holder.itemView.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-              ProductInfoBottom bottomSheet = new ProductInfoBottom(mContext, trendingProducts,historyUpdated);
-              bottomSheet.show(supportFragmentManager, "ModalBottomSheet");
-          }
-      });
-
-
-//        Bundle bundle = new Bundle();
-//        bundle.putString("partyId", partyId );
-//        BottomSheetDialog bottomSheet = new BottomSheetDialog();
-//        bottomSheet.setArguments(bundle);
-//        bottomSheet.show(getSupportFragmentManager(), "ModalBottomSheet");
+        holder.itemView.setOnClickListener(v -> {
+            ProductInfoBottom bottomSheet = new ProductInfoBottom(mContext, trendingProducts);
+            bottomSheet.show(supportFragmentManager, "ModalBottomSheet");
+        });
 
     }
 
@@ -84,16 +67,17 @@ public class TrendingRecyclerAdapter extends RecyclerView.Adapter<TrendingRecycl
         return trendingList.size();
     }
 
-    public static class Viewholder extends RecyclerView.ViewHolder{
+    public static class Viewholder extends RecyclerView.ViewHolder {
         ImageView productImage;
         CircleImageView crownImage;
-        TextView productName,productPrice;
-        public Viewholder(@NonNull  View itemView) {
+        TextView productName, productPrice;
+
+        public Viewholder(@NonNull View itemView) {
             super(itemView);
-            productImage = (ImageView) itemView.findViewById(R.id.productImage);
-            crownImage = (CircleImageView) itemView.findViewById(R.id.crown);
-            productName = (TextView) itemView.findViewById(R.id.productName);
-            productPrice = (TextView) itemView.findViewById(R.id.productPrice);
+            productImage = itemView.findViewById(R.id.productImage);
+            crownImage = itemView.findViewById(R.id.crown);
+            productName = itemView.findViewById(R.id.productName);
+            productPrice = itemView.findViewById(R.id.productPrice);
         }
     }
 }

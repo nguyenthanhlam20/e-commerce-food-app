@@ -19,14 +19,14 @@ public final class StringHelper {
     }
 
     public static boolean isValidUsername(String value) {
-        String patternStr =  "^[a-z\\d]{8,}$";
+        String patternStr = "^[a-z\\d]{8,}$";
         Pattern pattern = Pattern.compile(patternStr);
         Matcher matcher = pattern.matcher(value);
         return matcher.matches();
     }
 
     public static boolean isValidPassword(String value) {
-        String patternStr =  "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,}$";
+        String patternStr = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,}$";
         Pattern pattern = Pattern.compile(patternStr);
         Matcher matcher = pattern.matcher(value);
         return matcher.matches();

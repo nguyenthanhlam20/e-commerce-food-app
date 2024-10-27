@@ -1,44 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#E5E5E5"
         tools:context=".CartActivity">
+
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:background="#FF6200EE"
             android:id="@+id/txt3"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FF6200EE">
+
             <TextView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
-                android:text="My Cart"
-                android:textColor="#fff"
-                android:fontFamily="@font/nunito_bold"
+                android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_margin="15dp"
-                android:textSize="15dp"
-                android:layout_height="wrap_content"/>
-
-
+                android:fontFamily="@font/nunito_bold"
+                android:text="My Cart"
+                android:textColor="#fff"
+                android:textSize="15dp" />
         </RelativeLayout>
 
-
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_below="@+id/txt3"
             android:id="@+id/cartView"
-            android:layout_height="match_parent"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="50sp"
+            android:layout_below="@+id/txt3" />
+
         <ImageView
             android:id="@+id/emptyCart"
             android:layout_width="wrap_content"
-            android:visibility="gone"
-            android:layout_centerHorizontal="true"
             android:layout_height="wrap_content"
-            android:src="@drawable/empty_cart"/>
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/empty_cart"
+            android:visibility="gone" />
+
+        <!-- Button aligned to the bottom -->
+        <Button
+            android:id="@+id/checkout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/splash_bg"
+            android:text="Check out"
+            android:textColor="#ffffff" />
+
     </RelativeLayout>
 </layout>

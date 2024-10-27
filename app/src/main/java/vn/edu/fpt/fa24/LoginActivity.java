@@ -11,10 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import vn.edu.fpt.fa24.Helpers.JsonHelper;
 import vn.edu.fpt.fa24.Helpers.SessionHelper;
-import vn.edu.fpt.fa24.Models.Accounts.AccountModel;
+import vn.edu.fpt.fa24.Models.AccountModel;
 import vn.edu.fpt.fa24.Models.Authentication.LoginModel;
 import vn.edu.fpt.fa24.Services.AuthenticationService;
-import vn.edu.fpt.fa24.Services.Callbacks.ResponseCallBack;
+import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
 
 public class LoginActivity extends AppCompatActivity {
     EditText mEmail, mPassword;
@@ -31,14 +31,15 @@ public class LoginActivity extends AppCompatActivity {
         initializations();
         clickListeners();
 
-        // DEVELOPMENT
-        goToHomePage();
+        if(sessionHelper.isLoggedIn()) {
+            goToHomePage();
+        }
     }
 
     private void goToHomePage() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
-        sessionHelper.saveUserId(String.valueOf(1));
+//        sessionHelper.saveUserId(String.valueOf(1));
     }
 
     private void initializations() {
@@ -75,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             AccountModel account = jsonHelper.parse(response, AccountModel.class);
                             sessionHelper.saveUserId(String.valueOf(account.getAccountId()));
+                            sessionHelper.saveIsLoggedIn(true);
 
                             Toast.makeText(LoginActivity.this, "Login successfully", Toast.LENGTH_SHORT).show();
                             finish();
@@ -83,14 +85,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(String error) {
-                        runOnUiThread(() -> {
-                            Toast.makeText(LoginActivity.this, error, Toast.LENGTH_SHORT).show();
-                        });
+                        runOnUiThread(() -> Toast.makeText(LoginActivity.this, error, Toast.LENGTH_SHORT).show());
                     }
                 });
-
             }
-
         });
     }
 }

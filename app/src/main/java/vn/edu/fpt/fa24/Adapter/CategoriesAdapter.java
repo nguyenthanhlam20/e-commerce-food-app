@@ -15,17 +15,17 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import vn.edu.fpt.fa24.Models.CategoriesModel;
+import vn.edu.fpt.fa24.Models.CategoryModel;
 import vn.edu.fpt.fa24.R;
 import vn.edu.fpt.fa24.Services.CategoryService;
 import vn.edu.fpt.fa24.ViewAllProductsActivity;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Viewholder> {
-    ArrayList<CategoriesModel> categoriesList;
+    ArrayList<CategoryModel> categoriesList;
     Context mContext;
     CategoryService service;
 
-    public CategoriesAdapter(ArrayList<CategoriesModel> categoriesList, Context context) {
+    public CategoriesAdapter(ArrayList<CategoryModel> categoriesList, Context context) {
         this.categoriesList = categoriesList;
         this.mContext = context;
         this.service = new CategoryService();
@@ -40,7 +40,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull Viewholder holder, int position) {
-        CategoriesModel model = categoriesList.get(position);
+        CategoryModel model = categoriesList.get(position);
         holder.categoryName.setText(model.getCategoryName());
         Picasso.get().load(model.getCategoryImage())
                 .into(holder.categoryImage);
@@ -48,7 +48,8 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(mContext, ViewAllProductsActivity.class);
             intent.putExtra("type", "category");
-            intent.putExtra("category", model.getCategoryName());
+            intent.putExtra("categoryName", model.getCategoryName());
+            intent.putExtra("categoryId", model.getCategoryId());
             mContext.startActivity(intent);
         });
     }
@@ -64,8 +65,8 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
 
         public Viewholder(@NonNull View itemView) {
             super(itemView);
-            categoryName = (TextView) itemView.findViewById(R.id.categoryName);
-            categoryImage = (CircleImageView) itemView.findViewById(R.id.categoryImage);
+            categoryName = itemView.findViewById(R.id.categoryName);
+            categoryImage = itemView.findViewById(R.id.categoryImage);
         }
     }
 }

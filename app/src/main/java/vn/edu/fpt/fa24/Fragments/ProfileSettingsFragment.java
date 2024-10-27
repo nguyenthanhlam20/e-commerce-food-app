@@ -7,19 +7,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import vn.edu.fpt.fa24.Helpers.SessionHelper;
 import vn.edu.fpt.fa24.LoginActivity;
 import vn.edu.fpt.fa24.MyAccountActivity;
 import vn.edu.fpt.fa24.R;
 
-
 public class ProfileSettingsFragment extends Fragment {
     View view;
     RelativeLayout logoutBtn, accountBtn;
+    private SessionHelper sessionHelper;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         initializations(inflater, container);
         clickListeners();
         return view;
@@ -30,17 +32,19 @@ public class ProfileSettingsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_profile_settings, container, false);
         logoutBtn = view.findViewById(R.id.logout);
         accountBtn = view.findViewById(R.id.myaccount);
+        sessionHelper = new SessionHelper(requireActivity());
     }
 
     private void clickListeners() {
         logoutBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            Intent intent = new Intent(requireActivity(), LoginActivity.class);
             startActivity(intent);
-            getActivity().finish();
+            sessionHelper.clearSession();
+            requireActivity().finish();
         });
 
         accountBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MyAccountActivity.class);
+            Intent intent = new Intent(requireActivity(), MyAccountActivity.class);
             startActivity(intent);
         });
     }

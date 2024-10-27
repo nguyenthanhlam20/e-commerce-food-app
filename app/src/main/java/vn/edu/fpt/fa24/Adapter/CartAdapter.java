@@ -15,112 +15,143 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-
-import vn.edu.fpt.fa24.BuildConfig;
 import vn.edu.fpt.fa24.CartActivity;
-import vn.edu.fpt.fa24.DatabaseHelper.DatabaseHelper;
 import vn.edu.fpt.fa24.Fragments.ProductInfoBottom;
-import vn.edu.fpt.fa24.Models.TrendingProducts;
+import vn.edu.fpt.fa24.Helpers.SessionHelper;
+import vn.edu.fpt.fa24.Listeners.CartListener;
+import vn.edu.fpt.fa24.Models.Cart.CartItemModel;
+import vn.edu.fpt.fa24.Models.Cart.CartModel;
+import vn.edu.fpt.fa24.Models.ProductModel;
 import vn.edu.fpt.fa24.R;
+import vn.edu.fpt.fa24.Requests.CartRequest;
+import vn.edu.fpt.fa24.Requests.DeleteFromCartRequest;
+import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
+import vn.edu.fpt.fa24.Services.CartService;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.Viewholder> {
-    Context mContext;
-    int click =1 ;
+    CartActivity mContext;
     FragmentManager fragmentManager;
-    DatabaseHelper databaseHelper;
+    CartModel cart;
+    CartService cartService;
+    SessionHelper session;
+    private String userId;
 
-    ArrayList<TrendingProducts> arrayList = new ArrayList<>();
-    public CartAdapter(CartActivity cartActivity, ArrayList<TrendingProducts> arrayList, DatabaseHelper databaseHelper, FragmentManager fragmentManager) {
+    public CartAdapter(CartActivity cartActivity, CartModel cart, FragmentManager fragmentManager) {
         mContext = cartActivity;
-        this.fragmentManager=fragmentManager;
-        this.arrayList=arrayList;
-        this.databaseHelper=databaseHelper;
+        this.fragmentManager = fragmentManager;
+        this.cart = cart;
     }
 
     @NonNull
-
     @Override
-    public Viewholder onCreateViewHolder(@NonNull  ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cart_layout,parent,false);
+    public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cart_layout, parent, false);
+        cartService = new CartService();
+        session = new SessionHelper(mContext);
+        userId = session.getUserId();
+
         return new Viewholder(view);
     }
 
+    public void notifyCartChanged(Context context) {
+        Intent intent = new Intent(CartListener.ACTION_UPDATE_CART);
+        context.sendBroadcast(intent);
+    }
+
+
     @Override
-    public void onBindViewHolder(@NonNull  Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
+        CartItemModel cartItem = cart.getCartItems().get(position);
+        ProductModel product = cartItem.getProducts();
+        String productId = product.getProductId();
+        String price = product.getUnitPrice();
+        int quantity = cartItem.getQuantity();
+        int cardId = cart.getCartId();
 
-        TrendingProducts trendingProducts = arrayList.get(position);
+        holder.pName.setText(product.getProductName());
+        holder.pPrice.setText(product.getFormattedUnitPrice());
+        holder.pDesc.setText(product.getDescription());
+        holder.pQuantity.setText("Quantity: " + quantity);
+        Picasso.get().load(product.getProductImage()).into(holder.pImage);
 
-        holder.pName.setText(trendingProducts.getName());
-        holder.pPrice.setText(trendingProducts.getPrice());
-        holder.pDesc.setText(trendingProducts.getDescription());
-
-        Picasso.get().load(trendingProducts.getImage())
-                .into(holder.pImage);
-
-        holder.likeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (click ==0 ){
-                    holder.likeBtn.setImageResource(R.drawable.heart_filled2);
-                    ++click;
-                    if(databaseHelper.addText(trendingProducts)){
-
-                        Toast.makeText(mContext, "Added to cart", Toast.LENGTH_SHORT).show();
-                    }
-
-                }else{
-                    holder.likeBtn.setImageResource(R.drawable.heart2);
-                    --click;
-                    if(databaseHelper.deleteRow(trendingProducts.getId())){
-
-                        Toast.makeText(mContext, "Removed from cart", Toast.LENGTH_SHORT).show();
-                    }
-
-
-
+        holder.plusBtn.setOnClickListener(v -> {
+            CartRequest request = new CartRequest(userId, productId, "1", price);
+            cartService.addToCart(request, new ResponseCallBack<String>() {
+                @Override
+                public void onSuccess(String response) {
+                    notifyCartChanged(mContext);
+                    mContext.runOnUiThread(() -> Toast.makeText(mContext, "Updated product quantity successfully", Toast.LENGTH_SHORT).show());
                 }
 
+                @Override
+                public void onFailure(String error) {
+                    mContext.runOnUiThread(() -> Toast.makeText(mContext, "Failed to update product quantity", Toast.LENGTH_SHORT).show());
+                }
+            });
+        });
+        holder.minusBtn.setOnClickListener(v -> {
+            int newQuantity = quantity - 1;
+            if (newQuantity > 0) {
+                CartRequest request = new CartRequest(userId, productId, String.valueOf(newQuantity), price);
+                cartService.updateCart(cardId, request, new ResponseCallBack<String>() {
+                    @Override
+                    public void onSuccess(String response) {
+                        notifyCartChanged(mContext);
+                        mContext.runOnUiThread(() -> Toast.makeText(mContext, "Updated product quantity successfully", Toast.LENGTH_SHORT).show());
+                    }
+
+                    @Override
+                    public void onFailure(String error) {
+                        mContext.runOnUiThread(() -> Toast.makeText(mContext, "Failed to update product quantity", Toast.LENGTH_SHORT).show());
+                    }
+                });
             }
         });
-        holder.shareBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT,
-                        "Download the Crefti App from the google play store in order to view the product : https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID);
-                sendIntent.setType("text/plain");
-                mContext.startActivity(sendIntent);
-            }
+        holder.trashBtn.setOnClickListener(v -> {
+            DeleteFromCartRequest deleteRequest = new DeleteFromCartRequest(userId, productId);
+            cartService.deleteFromCart(deleteRequest, new ResponseCallBack<String>() {
+                @Override
+                public void onSuccess(String response) {
+                    notifyCartChanged(mContext);
+                    mContext.runOnUiThread(() -> Toast.makeText(mContext, "Removed from cart", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    mContext.runOnUiThread(() -> Toast.makeText(mContext, "Failed to remove product from cart", Toast.LENGTH_SHORT).show());
+                }
+            });
         });
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ProductInfoBottom bottomSheet = new ProductInfoBottom(mContext, trendingProducts);
-                bottomSheet.show(fragmentManager, "ModalBottomSheet");
-            }
+        holder.itemView.setOnClickListener(v -> {
+            ProductInfoBottom bottomSheet = new ProductInfoBottom(mContext, product);
+            bottomSheet.show(fragmentManager, "ModalBottomSheet");
         });
+
     }
 
     @Override
     public int getItemCount() {
-        return arrayList.size();
+        return cart.getProducts().size();
     }
 
-    public static class Viewholder extends RecyclerView.ViewHolder{
+    public static class Viewholder extends RecyclerView.ViewHolder {
 
-        private TextView pName,pDesc,pPrice;
-        private ImageView pImage,likeBtn,shareBtn;
-        public Viewholder(@NonNull  View itemView) {
+        private TextView pName, pDesc, pPrice, pQuantity;
+        private ImageView pImage, minusBtn, plusBtn, trashBtn;
+
+
+        public Viewholder(@NonNull View itemView) {
             super(itemView);
-            pName = (TextView) itemView.findViewById(R.id.pName);
-            pPrice = (TextView) itemView.findViewById(R.id.pPrice);
-            pDesc = (TextView) itemView.findViewById(R.id.pDesc);
-            pImage = (ImageView) itemView.findViewById(R.id.pImage);
-            likeBtn = (ImageView) itemView.findViewById(R.id.likeBtn);
-            shareBtn = (ImageView) itemView.findViewById(R.id.shareBtn);
+            pName = itemView.findViewById(R.id.pName);
+            pPrice = itemView.findViewById(R.id.pPrice);
+            pDesc = itemView.findViewById(R.id.pDesc);
+            pImage = itemView.findViewById(R.id.pImage);
+            pQuantity = itemView.findViewById(R.id.pQuantity);
+            plusBtn = itemView.findViewById(R.id.plusBtn);
+            trashBtn = itemView.findViewById(R.id.trashBtn);
+            minusBtn = itemView.findViewById(R.id.minusBtn);
         }
     }
 }

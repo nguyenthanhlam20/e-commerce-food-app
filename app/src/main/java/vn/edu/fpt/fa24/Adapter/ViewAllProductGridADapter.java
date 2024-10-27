@@ -16,44 +16,41 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import vn.edu.fpt.fa24.Fragments.HomeFragment;
 import vn.edu.fpt.fa24.Fragments.ProductInfoBottom;
-import vn.edu.fpt.fa24.Models.TrendingProducts;
+import vn.edu.fpt.fa24.Models.ProductModel;
 import vn.edu.fpt.fa24.R;
 import vn.edu.fpt.fa24.ViewAllProductsActivity;
 
 public class ViewAllProductGridADapter extends RecyclerView.Adapter<ViewAllProductGridADapter.Viewholder> {
     Context context;
-    ArrayList<TrendingProducts> locals = new ArrayList<>();
-    public ViewAllProductGridADapter(ViewAllProductsActivity viewAllProductsActivity, ArrayList<TrendingProducts> locals) {
+    ArrayList<ProductModel> locals = new ArrayList<>();
+
+    public ViewAllProductGridADapter(ViewAllProductsActivity viewAllProductsActivity, ArrayList<ProductModel> locals) {
         context = viewAllProductsActivity;
-        this.locals=locals;
+        this.locals = locals;
     }
 
     @NonNull
     @Override
     public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.local_product_layout,parent,false);
+        view = LayoutInflater.from(parent.getContext()).inflate(R.layout.local_product_layout, parent, false);
         return new Viewholder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull Viewholder holder, int position) {
-        TrendingProducts model = locals.get(position);
+        ProductModel model = locals.get(position);
 
-        holder.productPrice.setText(model.getPrice());
-        holder.productName.setText(model.getName());
+        holder.productPrice.setText(model.getFormattedUnitPrice());
+        holder.productName.setText(model.getProductName());
         holder.productDesc.setText(model.getDescription());
-        Picasso.get().load(model.getImage())
+        Picasso.get().load(model.getProductImage())
                 .into(holder.productImage);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
-                ProductInfoBottom bottomSheet = new ProductInfoBottom(context, model, HomeFragment.historyUpdated);
-                bottomSheet.show(manager, "ModalBottomSheet");
-            }
+        holder.itemView.setOnClickListener(v -> {
+            FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
+            ProductInfoBottom bottomSheet = new ProductInfoBottom(context, model);
+            bottomSheet.show(manager, "ModalBottomSheet");
         });
     }
 
@@ -62,16 +59,17 @@ public class ViewAllProductGridADapter extends RecyclerView.Adapter<ViewAllProdu
         return locals.size();
     }
 
-    public static class Viewholder extends RecyclerView.ViewHolder{
+    public static class Viewholder extends RecyclerView.ViewHolder {
 
-        TextView productName,productPrice,productDesc;
+        TextView productName, productPrice, productDesc;
         ImageView productImage;
+
         public Viewholder(@NonNull View itemView) {
             super(itemView);
-            productName = (TextView) itemView.findViewById(R.id.productName);
-            productDesc = (TextView) itemView.findViewById(R.id.productDesc2);
-            productPrice = (TextView) itemView.findViewById(R.id.productPrice);
-            productImage = (ImageView) itemView.findViewById(R.id.productImage);
+            productName = itemView.findViewById(R.id.productName);
+            productDesc = itemView.findViewById(R.id.productDesc2);
+            productPrice = itemView.findViewById(R.id.productPrice);
+            productImage = itemView.findViewById(R.id.productImage);
         }
     }
 }

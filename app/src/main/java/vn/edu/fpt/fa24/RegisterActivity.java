@@ -13,7 +13,7 @@ import vn.edu.fpt.fa24.Helpers.SessionHelper;
 import vn.edu.fpt.fa24.Helpers.StringHelper;
 import vn.edu.fpt.fa24.Models.Authentication.RegisterModel;
 import vn.edu.fpt.fa24.Services.AuthenticationService;
-import vn.edu.fpt.fa24.Services.Callbacks.ResponseCallBack;
+import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
 
 public class RegisterActivity extends AppCompatActivity {
     EditText mEmail, mPassword, mUserName, mConfirmPassword, mPhone;

@@ -2,7 +2,7 @@ package vn.edu.fpt.fa24.Services;
 
 import vn.edu.fpt.fa24.Models.Authentication.LoginModel;
 import vn.edu.fpt.fa24.Models.Authentication.RegisterModel;
-import vn.edu.fpt.fa24.Services.Callbacks.ResponseCallBack;
+import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
 
 public class AuthenticationService {
     public void Login(LoginModel model, ResponseCallBack<String> responseCallBack) {

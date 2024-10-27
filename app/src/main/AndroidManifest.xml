@@ -24,16 +24,10 @@
             android:name=".LoginActivity"
             android:exported="true" />
         <activity
-            android:name=".BuyActivity"
-            android:exported="true" />
-        <activity
             android:name=".ImageViewActivity"
             android:exported="true" />
         <activity
             android:name=".ViewAllProductsActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ReportActivity"
             android:exported="true" />
         <activity
             android:name=".CartActivity"

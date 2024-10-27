@@ -1,6 +1,9 @@
 package vn.edu.fpt.fa24;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -10,18 +13,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.viewpager.widget.ViewPager;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import vn.edu.fpt.fa24.Adapter.HomePageFragmentAdapter;
-import vn.edu.fpt.fa24.DatabaseHelper.DatabaseHelper;
-import vn.edu.fpt.fa24.Models.TrendingProducts;
+import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
+import vn.edu.fpt.fa24.Helpers.SessionHelper;
+import vn.edu.fpt.fa24.Listeners.CartListener;
+import vn.edu.fpt.fa24.Models.Cart.CartItemModel;
+import vn.edu.fpt.fa24.Models.Cart.CartModel;
+import vn.edu.fpt.fa24.Services.CartService;
 import vn.edu.fpt.fa24.databinding.ActivityMainBinding;
 
+@SuppressWarnings("ALL")
 public class MainActivity extends AppCompatActivity {
     HomePageFragmentAdapter mSectionsPagerAdapter;
     ActivityMainBinding binding;
     private MenuItem prevMenuItem;
-    DatabaseHelper databaseHelper;
+    CartService cartService;
+    SessionHelper sessionHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,26 +43,40 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, CartActivity.class);
             startActivity(intent);
         });
-        databaseHelper = new DatabaseHelper(this);
-        Handler handler2 = new Handler();
-        handler2.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<TrendingProducts> arrayList = databaseHelper.getAllData();
-                if (arrayList.size() == 0) {
-                    binding.cartCount.setVisibility(View.GONE);
-                } else {
-                    binding.cartCount.setText(String.valueOf(arrayList.size()));
-                    binding.cartCount.setVisibility(View.VISIBLE);
-                }
-            }
-        }, 1000);
+        cartService = new CartService();
+        sessionHelper = new SessionHelper(MainActivity.this);
 
+        setCartItems();
+        hideSplashView();
+    }
 
+    public void hideSplashView() {
         Handler handler = new Handler();
         handler.postDelayed(() -> binding.splashLayout.setVisibility(View.GONE), 1500);
-        //binding.viewpager.setPageTransformer(true,new ZoomOutTransformation());
         handleBottomNav();
+    }
+
+    private void setCartItems() {
+        String userId = sessionHelper.getUserId();
+        cartService.getCardByUserId(userId, new ResponseCallBack<CartModel>() {
+            @Override
+            public void onSuccess(CartModel response) {
+                runOnUiThread(() -> {
+                    List<CartItemModel> cartItems = response.getCartItems();
+                    if (cartItems.size() == 0) {
+                        binding.cartCount.setVisibility(View.GONE);
+                    } else {
+                        binding.cartCount.setText(String.valueOf(cartItems.size()));
+                        binding.cartCount.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                runOnUiThread(() -> binding.cartCount.setVisibility(View.GONE));
+            }
+        });
     }
 
     private void handleBottomNav() {
@@ -63,12 +86,6 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.home:
                     binding.viewpager.setCurrentItem(0);
                     binding.title.setText("Home");
-                    break;
-
-                case R.id.search:
-
-                    binding.viewpager.setCurrentItem(1);
-                    binding.title.setText("Search");
                     break;
 
                 case R.id.profile:
@@ -101,13 +118,6 @@ public class MainActivity extends AppCompatActivity {
                         binding.title.setText("Home");
                         break;
 
-
-                    case R.id.search:
-                        binding.viewpager.setCurrentItem(1);
-                        binding.title.setText("Search");
-                        break;
-
-
                     case R.id.profile:
                         binding.viewpager.setCurrentItem(2);
                         binding.title.setText("My Profile");
@@ -126,5 +136,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        // Register BroadcastReceiver
+        IntentFilter filter = new IntentFilter(CartListener.ACTION_UPDATE_CART);
+        registerReceiver(dataChangedReceiver, filter);
     }
+
+    private final BroadcastReceiver dataChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (CartListener.ACTION_UPDATE_CART.equals(intent.getAction())) {
+                // Implement action when get notified
+                setCartItems();
+            }
+        }
+    };
 }

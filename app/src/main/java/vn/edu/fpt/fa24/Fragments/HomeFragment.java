@@ -1,7 +1,7 @@
 package vn.edu.fpt.fa24.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.core.widget.NestedScrollView;
@@ -22,48 +21,28 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import io.realm.mongodb.mongo.MongoDatabase;
 import vn.edu.fpt.fa24.Adapter.AllProductsAdapter;
 import vn.edu.fpt.fa24.Adapter.CategoriesAdapter;
-import vn.edu.fpt.fa24.Adapter.RecentHistoryAdapter;
 import vn.edu.fpt.fa24.Adapter.TrendingRecyclerAdapter;
-import vn.edu.fpt.fa24.CustomDatabase;
-import vn.edu.fpt.fa24.DatabaseHelper.DatabaseHelper;
-import vn.edu.fpt.fa24.DatabaseHelper.ProductHistory;
-import vn.edu.fpt.fa24.Interfaces.HistoryUpdated;
-import vn.edu.fpt.fa24.Models.BannerModel;
-import vn.edu.fpt.fa24.Models.CategoriesModel;
-import vn.edu.fpt.fa24.Models.TrendingProducts;
+import vn.edu.fpt.fa24.Models.CategoryModel;
+import vn.edu.fpt.fa24.Models.ProductModel;
 import vn.edu.fpt.fa24.R;
-import vn.edu.fpt.fa24.Services.Callbacks.ResponseCallBack;
+import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
 import vn.edu.fpt.fa24.Services.CategoryService;
+import vn.edu.fpt.fa24.Services.ProductService;
 import vn.edu.fpt.fa24.ViewAllProductsActivity;
 
-public class HomeFragment extends Fragment implements HistoryUpdated {
-    ProductHistory productHistory;
-    LinearLayout noHistoryImage;
+public class HomeFragment extends Fragment {
     View mMainView;
     Button viewAllBtn;
-    RecyclerView mTrendingView, mProductsAcrossView, mCategoriesView, mRecentView;
-    MongoDatabase mongoDatabase;
-    ImageView bannerImage, midbannerImage;
+    RecyclerView mTrendingView, mAllProductsView, mCategoriesView;
+    ImageView bannerImage, centerBannerImage;
     TrendingRecyclerAdapter mAdapter;
     NestedScrollView nestedScrollView;
-    public static HistoryUpdated historyUpdated;
     AllProductsAdapter mAdapter2;
-    AllProductsAdapter mAdapter4;
     CategoriesAdapter mAdapter3;
-    RecentHistoryAdapter mRecentAdapter;
-    ArrayList<TrendingProducts> trendingList = new ArrayList<>();
-    ArrayList<TrendingProducts> abannerHomellProducts = new ArrayList<>();
-    ArrayList<TrendingProducts> locals = new ArrayList<>();
-    ArrayList<TrendingProducts> recentHistory = new ArrayList<>();
-    ArrayList<TrendingProducts> allProducts = new ArrayList<>();
-    ArrayList<String> ranks = new ArrayList<>();
-    ArrayList<BannerModel> banners = new ArrayList<>();
-    Button clearHistory;
-
     CategoryService categoryService;
+    ProductService productService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,41 +50,21 @@ public class HomeFragment extends Fragment implements HistoryUpdated {
     }
 
     private void initialize() {
-        mTrendingView = (RecyclerView) mMainView.findViewById(R.id.trendingView);
-        mProductsAcrossView = (RecyclerView) mMainView.findViewById(R.id.productsAcrossIndia);
-        mCategoriesView = (RecyclerView) mMainView.findViewById(R.id.categoriesView);
-        mRecentView = (RecyclerView) mMainView.findViewById(R.id.recentProduct);
-        bannerImage = (ImageView) mMainView.findViewById(R.id.bannerHome);
-        midbannerImage = (ImageView) mMainView.findViewById(R.id.midBanner);
-        clearHistory = (Button) mMainView.findViewById(R.id.clearHistory);
-        noHistoryImage = (LinearLayout) mMainView.findViewById(R.id.noHistory);
-        viewAllBtn = (Button) mMainView.findViewById(R.id.viewAllBtn);
-        nestedScrollView = (NestedScrollView) mMainView.findViewById(R.id.nestedScroll);
-        historyUpdated = (HistoryUpdated) this;
+        mTrendingView = mMainView.findViewById(R.id.trendingView);
+        mAllProductsView = mMainView.findViewById(R.id.allProducts);
+        mCategoriesView = mMainView.findViewById(R.id.categoriesView);
+        bannerImage = mMainView.findViewById(R.id.bannerHome);
+        centerBannerImage = mMainView.findViewById(R.id.midBanner);
+        viewAllBtn = mMainView.findViewById(R.id.viewAllBtn);
+        nestedScrollView = mMainView.findViewById(R.id.nestedScroll);
         categoryService = new CategoryService();
+        productService = new ProductService();
+        centerBannerImage.setOnClickListener(v -> {
 
-        midbannerImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SENDTO);
-                intent.setData(Uri.parse("mailto:macrocodes7400@gmail.com")); // only email apps should handle this
-                intent.putExtra(Intent.EXTRA_SUBJECT, "here is my valueable suggestion for you.");
-                if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
-                    startActivity(intent);
-                }
-            }
         });
 
-        bannerImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_SENDTO);
-                intent.setData(Uri.parse("mailto:macrocodes7400@gmail.com")); // only email apps should handle this
-                intent.putExtra(Intent.EXTRA_SUBJECT, "here is my valueable suggestion for you.");
-                if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
-                    startActivity(intent);
-                }
-            }
+        bannerImage.setOnClickListener(v -> {
+
         });
     }
 
@@ -117,63 +76,17 @@ public class HomeFragment extends Fragment implements HistoryUpdated {
         initialize();
 
         Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getBanner();
-                addCategories();
-                getTrendingData();
-                getAllProducts();
-
-                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-                mAdapter = new TrendingRecyclerAdapter(trendingList, getContext(), requireActivity().getSupportFragmentManager(), historyUpdated);
-                mTrendingView.setLayoutManager(linearLayoutManager);
-                mTrendingView.setAdapter(mAdapter);
-
-                //products across india adapter
-                mProductsAcrossView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-                mAdapter2 = new AllProductsAdapter(allProducts, getContext(), requireActivity().getSupportFragmentManager(), historyUpdated);
-                mProductsAcrossView.setAdapter(mAdapter2);
-
-                //Recent Product History
-                productHistory = new ProductHistory(getContext());
-                recentHistory = productHistory.getAllData();
-                DatabaseHelper databaseHelper = new DatabaseHelper(getContext());
-
-                mRecentAdapter = new RecentHistoryAdapter(recentHistory, databaseHelper, getContext(), getFragmentManager());
-                LinearLayoutManager linearLayoutManager4 = new LinearLayoutManager(getContext());
-                mRecentView.setLayoutManager(linearLayoutManager4);
-                mRecentView.setAdapter(mRecentAdapter);
-
-            }
+        handler.postDelayed(() -> {
+            getBanner();
+            addCategories();
+            getTrendingData();
+            getAllProducts();
         }, 1000);
-        //trending
 
-
-        if (recentHistory.size() == 0) {
-            noHistoryImage.setVisibility(View.VISIBLE);
-        } else {
-            noHistoryImage.setVisibility(View.GONE);
-        }
-
-        clearHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                productHistory.deleteRow();
-                recentHistory.clear();
-                noHistoryImage.setVisibility(View.VISIBLE);
-                mRecentAdapter.notifyDataSetChanged();
-                Toast.makeText(getContext(), "Product view history cleared", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        viewAllBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ViewAllProductsActivity.class);
-                intent.putExtra("type", "all");
-                startActivity(intent);
-            }
+        viewAllBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), ViewAllProductsActivity.class);
+            intent.putExtra("type", "all");
+            startActivity(intent);
         });
 
         return mMainView;
@@ -185,44 +98,29 @@ public class HomeFragment extends Fragment implements HistoryUpdated {
                 .into(bannerImage);
     }
 
-    private void getLocalProducts() {
-        CustomDatabase customDatabase = new CustomDatabase();
-//        for (QueryDocumentSnapshot datasnapshot : snapshots){
-//            TrendingProducts trendingProducts1 = datasnapshot.toObject(TrendingProducts.class);
-//            locals.add(trendingProducts1);
-//            mAdapter4.notifyDataSetChanged();
-//
-//        }
-    }
-
     private void getAllProducts() {
-        allProducts.clear();
-        CustomDatabase customDatabase = new CustomDatabase();
-//        CollectionReference products  = customDatabase.getSettings().collection("Trending");
-//        products.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot snapshots) {
-//                for (QueryDocumentSnapshot datasnapshot : snapshots){
-//                    TrendingProducts trendingProducts1 = datasnapshot.toObject(TrendingProducts.class);
-//                    allProducts.add(trendingProducts1);
-//                    mAdapter2.notifyDataSetChanged();
-//
-//                }
-//
-//            }
-//        }).addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                getLocalProducts();
-//            }
-//        });
+        productService.getProducts(new ResponseCallBack<ArrayList<ProductModel>>() {
+            @Override
+            public void onSuccess(ArrayList<ProductModel> response) {
+                requireActivity().runOnUiThread(() -> {
+                    mAllProductsView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+                    mAdapter2 = new AllProductsAdapter(response, getContext(), requireActivity().getSupportFragmentManager());
+                    mAllProductsView.setAdapter(mAdapter2);
+                });
+            }
+
+            @Override
+            public void onFailure(String error) {
+                requireActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Failed to load categories", Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private void addCategories() {
-        categoryService.getCategories(new ResponseCallBack<ArrayList<CategoriesModel>>() {
+        categoryService.getCategories(new ResponseCallBack<ArrayList<CategoryModel>>() {
             @Override
-            public void onSuccess(ArrayList<CategoriesModel> response) {
-                getActivity().runOnUiThread(() -> {
+            public void onSuccess(ArrayList<CategoryModel> response) {
+                requireActivity().runOnUiThread(() -> {
                     // Set up the RecyclerView and Adapter for horizontal scrolling
                     LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
                     mCategoriesView.setLayoutManager(linearLayoutManager2);
@@ -238,47 +136,30 @@ public class HomeFragment extends Fragment implements HistoryUpdated {
 
             @Override
             public void onFailure(String error) {
-                getActivity().runOnUiThread(() -> {
-                    Toast.makeText(getActivity(), "Failed to load categories", Toast.LENGTH_SHORT).show();
-                });
+                requireActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Failed to load categories", Toast.LENGTH_SHORT).show());
             }
         });
     }
 
     private void getTrendingData() {
+        productService.getTrendingProducts(new ResponseCallBack<ArrayList<ProductModel>>() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onSuccess(ArrayList<ProductModel> response) {
+                requireActivity().runOnUiThread(() -> {
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+                    mAdapter = new TrendingRecyclerAdapter(response, getContext(), requireActivity().getSupportFragmentManager());
+                    mTrendingView.setLayoutManager(linearLayoutManager);
+                    mTrendingView.setAdapter(mAdapter);
 
-//        trendingList.clear();
-//        CustomDatabase customDatabase = new CustomDatabase() ;
-//        CollectionReference products  = customDatabase.getSettings().collection("Trending");
-//        products.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//            @Override
-//            public void onSuccess(QuerySnapshot snapshots) {
-//                for (QueryDocumentSnapshot datasnapshot : snapshots){
-//                    TrendingProducts trendingProducts1 = datasnapshot.toObject(TrendingProducts.class);
-//                    trendingList.add(trendingProducts1);
-//                    mAdapter.notifyDataSetChanged();
-//
-//                }
-//
-//            }
-//        });
-    }
+                    mAdapter.notifyDataSetChanged();
+                });
+            }
 
-
-    @Override
-    public void getUpdateResult(boolean isUpdated) {
-        if (isUpdated) {
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    recentHistory.clear();
-                    recentHistory.addAll(productHistory.getAllData());
-                    mRecentAdapter.notifyDataSetChanged();
-                    if (recentHistory.size() > 0)
-                        noHistoryImage.setVisibility(View.GONE);
-                }
-            }, 1000);
-        }
+            @Override
+            public void onFailure(String error) {
+                requireActivity().runOnUiThread(() -> Toast.makeText(getActivity(), "Failed to load categories", Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 }

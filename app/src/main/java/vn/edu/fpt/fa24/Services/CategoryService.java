@@ -6,20 +6,19 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import vn.edu.fpt.fa24.Helpers.JsonHelper;
-import vn.edu.fpt.fa24.Models.CategoriesModel;
-import vn.edu.fpt.fa24.Services.Callbacks.ResponseCallBack;
+import vn.edu.fpt.fa24.Models.CategoryModel;
+import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
 
 public class CategoryService {
-    public void getCategories(ResponseCallBack<ArrayList<CategoriesModel>> categoriesCallback) {
+    public void getCategories(ResponseCallBack<ArrayList<CategoryModel>> categoriesCallback) {
         ClientService clientService = new ClientService("Category");
         clientService.executeGet(new ResponseCallBack<String>() {
             @Override
             public void onSuccess(String response) {
-                // Create a Type for List<AccountModel>
-                Type type = new TypeToken<ArrayList<CategoriesModel>>() {}.getType();
+                Type type = new TypeToken<ArrayList<CategoryModel>>() {}.getType();
 
-                JsonHelper<ArrayList<CategoriesModel>> jsonHelper = new JsonHelper();
-                ArrayList<CategoriesModel> categories = jsonHelper.parseList(response, type);
+                JsonHelper<ArrayList<CategoryModel>> jsonHelper = new JsonHelper();
+                ArrayList<CategoryModel> categories = jsonHelper.parseList(response, type);
                 categoriesCallback.onSuccess(categories);
             }
 

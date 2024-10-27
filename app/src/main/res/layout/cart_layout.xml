@@ -51,6 +51,17 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"/>
 
+                <TextView
+                    android:id="@+id/pQuantity"
+                    android:layout_width="match_parent"
+                    android:text="Quantity: 1"
+                    android:textSize="12dp"
+                    android:textColor="@color/teal_700"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="0.5"/>
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -73,19 +84,25 @@
                         android:maxLines="1"
                         android:layout_weight="1" />
                     <ImageView
-                        android:id="@+id/likeBtn"
-                        android:layout_width="34dp"
-                        android:layout_height="30dp"
+                        android:id="@+id/plusBtn"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_marginEnd="20dp"
-                        android:src="@drawable/heart_filled2" />
+                        android:src="@drawable/ic_plus" />
+                    <ImageView
+                        android:id="@+id/minusBtn"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginEnd="20dp"
+                        android:src="@drawable/ic_minus" />
 
                     <ImageView
-                        android:id="@+id/shareBtn"
-                        android:layout_width="30dp"
+                        android:id="@+id/trashBtn"
+                        android:layout_width="32dp"
                         android:backgroundTint="#FF6200EE"
-                        android:layout_height="30dp"
+                        android:layout_height="32dp"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/share" />
+                        android:src="@drawable/ic_trash" />
                 </LinearLayout>
 
             </LinearLayout>
