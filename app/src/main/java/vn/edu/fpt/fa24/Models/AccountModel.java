@@ -6,6 +6,8 @@ public class AccountModel {
 
     private int accountId;
 
+    private int userId;
+
     private String username;
 
     private String password;
@@ -15,6 +17,14 @@ public class AccountModel {
     private Date createdAt = new Date();
 
     private Date updatedAt;
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     // Getters and Setters
     public int getAccountId() {
