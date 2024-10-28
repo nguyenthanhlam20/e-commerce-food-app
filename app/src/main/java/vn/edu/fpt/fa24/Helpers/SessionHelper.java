@@ -8,6 +8,7 @@ public class SessionHelper {
     private static final String PREF_NAME = "UserSession";
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private static final String KEY_USER_ID = "userId";
+    private static final String KEY_ACCOUNT_ID = "accountId";
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private Context context;
@@ -28,6 +29,15 @@ public class SessionHelper {
     public void saveUserId(String value) {
         editor.putString(KEY_USER_ID, value);
         editor.apply(); // Save changes asynchronously
+    }
+
+    public void saveAccountId(String value) {
+        editor.putString(KEY_ACCOUNT_ID, value);
+        editor.apply(); // Save changes asynchronously
+    }
+
+    public String getAccountId() {
+        return sharedPreferences.getString(KEY_ACCOUNT_ID, null);
     }
 
     // Method to check if user is logged in

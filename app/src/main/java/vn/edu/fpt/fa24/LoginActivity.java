@@ -31,9 +31,9 @@ public class LoginActivity extends AppCompatActivity {
         initializations();
         clickListeners();
 
-        if(sessionHelper.isLoggedIn()) {
-            goToHomePage();
-        }
+//        if(sessionHelper.isLoggedIn()) {
+//            goToHomePage();
+//        }
     }
 
     private void goToHomePage() {
@@ -75,7 +75,8 @@ public class LoginActivity extends AppCompatActivity {
                             startActivity(intent);
 
                             AccountModel account = jsonHelper.parse(response, AccountModel.class);
-                            sessionHelper.saveUserId(String.valueOf(account.getAccountId()));
+                            sessionHelper.saveUserId(String.valueOf(account.getUserId()));
+                            sessionHelper.saveAccountId(String.valueOf(account.getAccountId()));
                             sessionHelper.saveIsLoggedIn(true);
 
                             Toast.makeText(LoginActivity.this, "Login successfully", Toast.LENGTH_SHORT).show();

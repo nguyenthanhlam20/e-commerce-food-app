@@ -38,7 +38,7 @@ public class MyAccountActivity extends AppCompatActivity {
     private UserModel getUserInput() {
         UserModel user = new UserModel();
         String formattedDate = dateHelper.formatDate(mDob.getText().toString());
-        user.setAccountId(sessionHelper.getUserId());
+        user.setAccountId(sessionHelper.getAccountId());
         user.setFirstName(mFirstName.getText().toString());
         user.setLastName(mLasName.getText().toString());
         user.setAddress(mAddress.getText().toString());
@@ -110,7 +110,7 @@ public class MyAccountActivity extends AppCompatActivity {
     }
 
     private void queryUser() {
-        userService.getUser(sessionHelper.getUserId(), new ResponseCallBack<UserModel>() {
+        userService.getUser(sessionHelper.getAccountId(), new ResponseCallBack<UserModel>() {
             @Override
             public void onSuccess(UserModel user) {
                 runOnUiThread(() -> setUser(user));
