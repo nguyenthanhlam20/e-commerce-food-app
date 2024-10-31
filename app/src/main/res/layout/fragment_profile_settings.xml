@@ -214,6 +214,42 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="65dp"
+                android:id="@+id/orderHistory"
+                android:background="?attr/selectableItemBackground">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/orderHistoryImage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="24dp"
+
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="15dp"
+                    android:src="@drawable/ic_history" />
+
+                <TextView
+                    android:id="@+id/orderHistoryName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginStart="30dp"
+                    android:fontFamily="@font/nunito_semibold"
+                    android:layout_toEndOf="@+id/orderHistoryImage"
+                    android:text="Order History"
+
+                    android:layout_centerVertical="true"
+                    android:textColor="#031161"
+                    android:textSize="16dp" />
+
+
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
                 android:id="@+id/logout"
                 android:background="?attr/selectableItemBackground">
 

@@ -5,8 +5,10 @@ import android.content.Context;
 import android.util.Log;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
 
 import vn.edu.fpt.fa24.Callbacks.DatePickerCallback;
 
@@ -26,6 +28,11 @@ public class DateHelper {
         this.context = context;
     }
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+
+    public String parseDate(String rawDate) {
+        return LocalDateTime.parse(rawDate, formatter).toLocalDate().toString();
+    }
     public String showDate(String rawDate) {
         try {
             Log.i("show date", rawDate);

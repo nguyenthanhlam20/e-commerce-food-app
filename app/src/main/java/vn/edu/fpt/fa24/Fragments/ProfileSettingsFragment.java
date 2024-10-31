@@ -13,11 +13,12 @@ import androidx.fragment.app.Fragment;
 import vn.edu.fpt.fa24.Helpers.SessionHelper;
 import vn.edu.fpt.fa24.LoginActivity;
 import vn.edu.fpt.fa24.MyAccountActivity;
+import vn.edu.fpt.fa24.OrderHistoryActivity;
 import vn.edu.fpt.fa24.R;
 
 public class ProfileSettingsFragment extends Fragment {
     View view;
-    RelativeLayout logoutBtn, accountBtn;
+    RelativeLayout logoutBtn, accountBtn, historyBtn;
     private SessionHelper sessionHelper;
 
     @Override
@@ -32,6 +33,7 @@ public class ProfileSettingsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_profile_settings, container, false);
         logoutBtn = view.findViewById(R.id.logout);
         accountBtn = view.findViewById(R.id.myaccount);
+        historyBtn = view.findViewById(R.id.orderHistory);
         sessionHelper = new SessionHelper(requireActivity());
     }
 
@@ -45,6 +47,11 @@ public class ProfileSettingsFragment extends Fragment {
 
         accountBtn.setOnClickListener(v -> {
             Intent intent = new Intent(requireActivity(), MyAccountActivity.class);
+            startActivity(intent);
+        });
+
+        historyBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), OrderHistoryActivity.class);
             startActivity(intent);
         });
     }

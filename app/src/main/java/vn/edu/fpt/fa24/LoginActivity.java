@@ -31,15 +31,16 @@ public class LoginActivity extends AppCompatActivity {
         initializations();
         clickListeners();
 
-//        if(sessionHelper.isLoggedIn()) {
-//            goToHomePage();
-//        }
+        if(sessionHelper.isLoggedIn()) {
+            goToHomePage();
+        }
     }
 
     private void goToHomePage() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
-//        sessionHelper.saveUserId(String.valueOf(1));
+        sessionHelper.saveUserId(String.valueOf(1));
+        sessionHelper.saveAccountId(String.valueOf(1));
     }
 
     private void initializations() {
