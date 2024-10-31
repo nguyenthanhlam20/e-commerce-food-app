@@ -31,9 +31,9 @@ public class LoginActivity extends AppCompatActivity {
         initializations();
         clickListeners();
 
-        if(sessionHelper.isLoggedIn()) {
-            goToHomePage();
-        }
+//        if(sessionHelper.isLoggedIn()) {
+//            goToHomePage();
+//        }
     }
 
     private void goToHomePage() {
