@@ -1,14 +1,13 @@
 package vn.edu.fpt.fa24;
 
-import androidx.appcompat.app.AppCompatActivity;
+import static androidx.databinding.DataBindingUtil.setContentView;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import java.util.List;
 

@@ -9,6 +9,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.Serializable;
+
+import vn.edu.fpt.fa24.Helpers.JsonHelper;
 import vn.edu.fpt.fa24.Helpers.SessionHelper;
 import vn.edu.fpt.fa24.Helpers.StringHelper;
 import vn.edu.fpt.fa24.Models.Authentication.RegisterModel;
@@ -21,11 +24,11 @@ public class RegisterActivity extends AppCompatActivity {
     Button mRegisterBtn;
     AuthenticationService service;
     SessionHelper session;
+    JsonHelper<RegisterModel> jsonHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
         setContentView(R.layout.activity_register);
         initializations();
         clickListeners();
@@ -41,6 +44,7 @@ public class RegisterActivity extends AppCompatActivity {
         mRegisterBtn = findViewById(R.id.registerBtn);
         service = new AuthenticationService();
         session = new SessionHelper(RegisterActivity.this);
+        jsonHelper = new JsonHelper<>();
     }
 
     private void clickListeners() {
@@ -87,15 +91,20 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             RegisterModel model = new RegisterModel(username, password, confirmPassword, email, phone, "");
-            service.Register(model, new ResponseCallBack<String>() {
+            service.SendEmail(model, new ResponseCallBack<String>() {
                 @Override
                 public void onSuccess(String response) {
                     runOnUiThread(() -> {
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+//                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+//                        startActivity(intent);
+
+                        Intent intent = new Intent(RegisterActivity.this, EmailConfirmActivity.class);
+                        intent.putExtra("RegisterModelJson", jsonHelper.toJson(model));
+                        intent.putExtra("RegistCode", response);
                         startActivity(intent);
 
-                        session.saveUserId(response);
-                        Toast.makeText(RegisterActivity.this, "Register successfully", Toast.LENGTH_SHORT).show();
+//                        session.saveUserId(response);
+//                        Toast.makeText(RegisterActivity.this, "Register successfully", Toast.LENGTH_SHORT).show();
 
                         finish();
                     });

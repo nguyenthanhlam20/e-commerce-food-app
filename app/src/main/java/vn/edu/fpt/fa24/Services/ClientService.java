@@ -21,7 +21,7 @@ import vn.edu.fpt.fa24.Callbacks.ResponseCallBack;
 
 public class ClientService<T> {
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private static final String BASE_API = "http://10.0.2.2:7115/api/"; // Adjusted for Android emulator
+    private static final String BASE_API = "http://10.0.2.2:5288/api/"; // Adjusted for Android emulator
     private JSONObject data = new JSONObject();
     private String jsonData = "";
     private String url;

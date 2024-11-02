@@ -25,7 +25,7 @@
         android:layout_centerVertical="true"
         android:layout_height="wrap_content">
         <EditText
-            android:id="@+id/loginEmail"
+            android:id="@+id/loginUsername"
             android:layout_width="match_parent"
             android:padding="18dp"
             android:layout_marginStart="20dp"
@@ -52,6 +52,13 @@
             android:inputType="textPassword"
             android:autofillHints="password"
             android:hint="@string/password"/>
+
+        <CheckBox
+            android:id="@+id/checkBoxSavePassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="Remember password?" />
 
         <Button
             android:id="@+id/loginBtn"
