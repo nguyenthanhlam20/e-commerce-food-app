@@ -16,6 +16,21 @@ public class AuthenticationService {
         clientService.executePost(responseCallBack);
     }
 
+    public void SendEmail(RegisterModel model, ResponseCallBack<String> responseCallBack) {
+        ClientService clientService = new ClientService("Email/send");
+
+        // Adding parameters
+        clientService.addParam("username", model.getUsername());
+        clientService.addParam("password", model.getPassword());
+        clientService.addParam("email", model.getEmail());
+        clientService.addParam("phone", model.getPhone());
+        clientService.addParam("confirmPassword", model.getRePassword());
+        clientService.addParam("registCode", model.getOtp());
+
+        // Execute POST request
+        clientService.executePost(responseCallBack);
+    }
+
     public void Register(RegisterModel model, ResponseCallBack<String> responseCallBack) {
         ClientService clientService = new ClientService("Account/register");
 
