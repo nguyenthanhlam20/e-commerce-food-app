@@ -26,8 +26,8 @@ public class UserService {
         });
     }
 
-    public void updateUser(UserModel user, ResponseCallBack<String> callback) {
-        ClientService clientService = new ClientService("User");
+    public void updateUser(String accountId, UserModel user, ResponseCallBack<String> callback) {
+        ClientService clientService = new ClientService("User/" + accountId);
         clientService.setJsonData(new Gson().toJson(user));
 
         clientService.executePut(new ResponseCallBack<String>() {

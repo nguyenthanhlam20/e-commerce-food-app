@@ -33,6 +33,7 @@ public class DateHelper {
     public String parseDate(String rawDate) {
         return LocalDateTime.parse(rawDate, formatter).toLocalDate().toString();
     }
+
     public String showDate(String rawDate) {
         try {
             Log.i("show date", rawDate);
@@ -92,7 +93,19 @@ public class DateHelper {
                 context,
                 (view, selectedYear, selectedMonth, selectedDay) -> {
                     // Format selected date and set it to the EditText
-                    setSelectedDate(selectedYear + "-" + selectedDay + "-" + (selectedMonth + 1));
+                    String validDay = String.valueOf(selectedDay);
+                    String validMonth = String.valueOf(selectedMonth + 1);
+
+
+                    if (validDay.length() == 1) {
+                        validDay = "0" + validDay;
+                    }
+
+                    if (validMonth.length() == 1) {
+                        validMonth = "0" + validMonth;
+                    }
+
+                    setSelectedDate(selectedYear + "-" + validDay + "-" + validMonth);
                     callback.setDate(showSelectedDate());
                 },
                 year, month, day
