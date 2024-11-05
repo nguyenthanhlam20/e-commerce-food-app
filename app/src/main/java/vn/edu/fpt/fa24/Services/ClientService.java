@@ -72,11 +72,7 @@ public class ClientService<T> {
                 } else {
                     String errorMessage = response.body() != null ? response.body().string() : "Unknown error";
                     Log.e("error", errorMessage);
-                    if(errorMessage.length() > 20) {
-                        callback.onFailure("Unknown error");
-                    } else {
-                        callback.onFailure(errorMessage);
-                    }
+                    callback.onFailure(errorMessage);
                 }
             }
         });
@@ -106,13 +102,8 @@ public class ClientService<T> {
                     callback.onSuccess(responseData);
                 } else {
                     String errorMessage = response.body() != null ? response.body().string() : "Unknown error";
-
                     Log.e("error", errorMessage);
-                    if(errorMessage.length() > 20) {
-                        callback.onFailure("Unknown error");
-                    } else {
-                        callback.onFailure(errorMessage);
-                    }
+                    callback.onFailure(errorMessage);
                 }
             }
         });
@@ -143,11 +134,7 @@ public class ClientService<T> {
                 } else {
                     String errorMessage = response.body() != null ? response.body().string() : "Unknown error";
                     Log.e("error", errorMessage);
-                    if(errorMessage.length() > 20) {
-                        callback.onFailure("Unknown error");
-                    } else {
-                        callback.onFailure(errorMessage);
-                    }
+                    callback.onFailure(errorMessage);
                 }
             }
         });

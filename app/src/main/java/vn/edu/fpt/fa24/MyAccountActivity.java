@@ -93,9 +93,9 @@ public class MyAccountActivity extends AppCompatActivity {
 
         saveBtn.setOnClickListener(view -> {
             if (!isValidInput()) return;
-
+            String accountId = sessionHelper.getAccountId();
             UserModel updateUser = getUserInput();
-            userService.updateUser(updateUser, new ResponseCallBack<String>() {
+            userService.updateUser(accountId, updateUser, new ResponseCallBack<String>() {
                 @Override
                 public void onSuccess(String response) {
                     runOnUiThread(() -> Toast.makeText(MyAccountActivity.this, response, Toast.LENGTH_SHORT).show());
