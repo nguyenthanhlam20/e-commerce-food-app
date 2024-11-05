@@ -28,5 +28,10 @@
     <string name="please_enter_the_confirmation_code_here_to_complete_registration">Please enter the confirmation code here to complete registration</string>
     <string name="enter_verification_code">Enter verification code</string>
     <string name="verify_code">Verify Code</string>
+    <string name="remember_password">Remember password?</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="username">Username</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="email">Email</string>
 
 </resources>

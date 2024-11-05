@@ -95,16 +95,11 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess(String response) {
                     runOnUiThread(() -> {
-//                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-//                        startActivity(intent);
-
                         Intent intent = new Intent(RegisterActivity.this, EmailConfirmActivity.class);
                         intent.putExtra("RegisterModelJson", jsonHelper.toJson(model));
                         intent.putExtra("RegistCode", response);
+                        intent.putExtra("Type", "Register");
                         startActivity(intent);
-
-//                        session.saveUserId(response);
-//                        Toast.makeText(RegisterActivity.this, "Register successfully", Toast.LENGTH_SHORT).show();
 
                         finish();
                     });

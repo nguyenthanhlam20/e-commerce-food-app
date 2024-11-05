@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HandmadeAffiliate">
         <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".EmailConfirmActivity"
             android:exported="false" />
         <activity
@@ -29,9 +32,6 @@
         <activity
             android:name=".RegisterActivity"
             android:exported="true" />
-        <activity
-            android:name=".EmailConfirmActivity"
-            android:exported="false" />
         <activity
             android:name=".LoginActivity"
             android:exported="true">

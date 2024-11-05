@@ -2,6 +2,7 @@ package vn.edu.fpt.fa24;
 
 import static androidx.databinding.DataBindingUtil.setContentView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
